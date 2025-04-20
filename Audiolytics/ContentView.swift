@@ -8,14 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-<<<<<<< Updated upstream
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-=======
     @State private var showAuth = false
     @State private var authCode: String?
     @State private var isLoggedIn = false
@@ -51,14 +43,11 @@ struct ContentView: View {
                     }
                    )
                }
->>>>>>> Stashed changes
         }
         .padding()
     }
 }
 
-<<<<<<< Updated upstream
-=======
 func exchangeCodeForToken(code: String, onComplete: @escaping (String) -> Void) {
     guard let verifier = UserDefaults.standard.string(forKey: "code_verifier") else { return }
    // guard code != "" else { return }
@@ -95,7 +84,6 @@ func exchangeCodeForToken(code: String, onComplete: @escaping (String) -> Void) 
     }.resume()
 }
 
->>>>>>> Stashed changes
 #Preview {
     ContentView()
 }
