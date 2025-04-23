@@ -9,25 +9,9 @@ import SwiftUI
 
 struct SearchView: View {
     @State private var searchText = ""
-    @State private var searchFor = ""
+    @State private var searchFor = "Song"
     var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "sparkle.magnifyingglass")
-                TextField("Choose a song...", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .padding(8)
-                    .cornerRadius(10)
-                    .onSubmit {
-                        print(searchText)
-                        // Search for similar songs
-                    }
-            }
-            .frame(maxWidth: 300)
-            .padding()
-            .background(Color(.systemGray6))
-            .clipShape(Capsule())
-            
             VStack {
                 Text("Would you like to search for:")
                 Picker("Search by", selection: $searchFor) {
@@ -35,6 +19,10 @@ struct SearchView: View {
                     Text("Album").tag("Album")
                     Text("Song").tag("Song")
                 }
+                TrackFilterView(searchMode: $searchFor) { year, genre, keyword, newAlbum, hipster in
+                    print("Console: \(year), \(genre), \(keyword), \(newAlbum), \(hipster)")
+                }
+                
                 // Depending on what is picked we allow for different selections
                 // Albums --> artist, year, album, upc, tag:new, tag:hipster
                 // Artists --> artist, year, genre,
