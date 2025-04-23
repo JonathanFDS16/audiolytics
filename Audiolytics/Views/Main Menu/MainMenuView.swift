@@ -5,12 +5,17 @@
 //  Created by Deborah Park on 4/21/25.
 //
 import SwiftUI
+import Foundation
+
 
 struct MainMenuView: View {
     @State private var token: String = ""
     let accessToken: String
     @State private var listeningData: [[ListeningData]] = []
     @State private var username: String = "User"
+    @State private var nowPlaying: TrackInfo?
+    @StateObject private var songTracker = SongTrackerModel()
+
 
 
     var body: some View {
@@ -21,6 +26,39 @@ struct MainMenuView: View {
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .padding(.leading, 50)
+                    
+                    if let track = songTracker.nowPlaying {
+                        HStack(spacing: 16) {
+                            if let url = track.albumArtURL {
+                                AsyncImage(url: url) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    Color.gray
+                                }
+                                .frame(width: 60, height: 60)
+                                .cornerRadius(8)
+                            }
+
+                            VStack(alignment: .leading) {
+                                Text(track.name)
+                                    .font(.headline)
+                                Text(track.artist)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                if !track.isPlaying, let playedAt = track.playedAt {
+                                    Text("Last played: \(playedAt.formatted(date: .abbreviated, time: .shortened))")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                } else {
+                                    Text("Now Playing")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
                 
                     WidgetCard(title: "Weekly Wrapped", icon: "calendar") {
                         WrappedView()
@@ -50,11 +88,14 @@ struct MainMenuView: View {
                     } catch {
                         print("Failed to fetch user profile:", error.localizedDescription)
                     }
+                        await songTracker.fetchNowOrLastPlayed(token: accessToken)
+                    }
+
                 }
             }
         }
 
-    }
+    
 
 #Preview {
     MainMenuView(accessToken: "fakeTokenForTesting")
