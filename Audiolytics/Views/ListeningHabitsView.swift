@@ -45,6 +45,6 @@ struct ListeningHabitsView: View {
 
 #Preview {
     NavigationStack {
-        ListeningHabitsView(allData: listeningData)
+        ListeningHabitsView(allData: MockListeningData.weekly)
     }
 }
