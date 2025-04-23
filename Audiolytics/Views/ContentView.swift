@@ -76,6 +76,7 @@ func exchangeCodeForToken(code: String, onComplete: @escaping (String) -> Void)
             {
                 print("Received tokens: \(json)")
                 if let accessToken = json["access_token"] as? String {
+                    UserDefaults.standard.set(accessToken, forKey: "access_token")
                     DispatchQueue.main.async {
                         onComplete(accessToken)
                     }

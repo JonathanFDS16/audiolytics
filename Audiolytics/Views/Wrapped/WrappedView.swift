@@ -6,22 +6,6 @@
 //
 import SwiftUI
 
-/* TOP 5 ARTISTS SHORT-TERM
- https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=5
- TOP 5 ARTISTS MEDIUM-TERM
- https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=5
- TOP 5 ARTISTS LONG-TERM
- https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5
- *****
- TOP 5 TRACKS SHORT-TERM
- https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=5
- TOP 5 TRACKS MEDIUM-TERM
- https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=5
- TOP 5 TRACKS LONG-TERM
- https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=5
- 
- */
-
 struct DataTestView: View{
     var body: some View{
         HStack{
