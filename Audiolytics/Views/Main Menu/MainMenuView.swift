@@ -32,7 +32,7 @@ struct MainMenuView: View {
                         }
 
                         HStack(spacing: 16) {
-                            NavigationLink(destination: WrappedView()) {
+                            NavigationLink(destination: TopView()) {
                                 CardView(title: "Weekly Wrapped", icon: "calendar")
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
@@ -57,6 +57,10 @@ struct MainMenuView: View {
                     .onAppear {
                         Task {
                             await songTracker.fetchNowOrLastPlayed(token: accessToken)
+                                   if let name = await songTracker.fetchUsername(token: accessToken) {
+                                       username = name
+                                       print("Fetched username: \(name)")
+                                   }
                         }
                     }
 

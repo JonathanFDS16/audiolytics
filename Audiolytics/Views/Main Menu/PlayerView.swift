@@ -9,6 +9,12 @@ import SwiftUI
 
 struct PlayerView: View {
     let track: TrackInfo
+    
+    init(track: TrackInfo) {
+            self.track = track
+            print("Track is playing? \(track.isPlaying)")
+            print("Track played at: \(String(describing: track.playedAt))")
+        }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -33,7 +39,7 @@ struct PlayerView: View {
             Text(track.artist)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-
+            
             if let playedAt = track.playedAt, !track.isPlaying {
                 Text("Last played: \(playedAt.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption)
