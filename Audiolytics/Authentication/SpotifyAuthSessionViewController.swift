@@ -14,7 +14,7 @@ struct SpotifyAuthSessionViewController: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        let scope = "user-read-private user-read-email user-read-playback-state user-read-recently-played "
+        let scope = "user-read-private user-read-email user-read-playback-state user-read-recently-played user-top-read"
         
         let verifier = generateRandomString(length: 64)
         let challenge = sha256Base64URL(verifier)

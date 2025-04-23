@@ -9,6 +9,7 @@ import SwiftUI
 struct TopView: View {
     @State private var topArtists: [Artist] = []
     @State private var topTracks: [Track] = []
+    @State private var genreList: [String] = []
     @State private var timeFrame: String = "short_term"
     @State private var limit: Int = 5
     
@@ -27,6 +28,20 @@ struct TopView: View {
             }
         }
     }
+    
+    func fetchGenres() {
+        SpotifyService().getTopArtists(timeRange: timeFrame, limitNum: limit) { artists in
+            DispatchQueue.main.async {
+                self.topArtists = artists
+                let genres = artists.compactMap { $0.genres }.flatMap { $0 }
+                           self.genreList = Array(Set(genres)).sorted()
+                           print("Genres: \(self.genreList)")
+            }
+        }
+        
+        
+    }
+    
 
     var body: some View {
         VStack() {

@@ -16,20 +16,18 @@ struct TopArtistsResponse: Codable {
 
 struct Track: Codable, Identifiable {
     let name: String
-    let artists: [Artist]
+    let artists: [SimpleArtist]
     let id = UUID()
 }
 
-struct Artist: Codable, Identifiable {
+struct SimpleArtist: Codable {
     let name: String
-    let id = UUID()
 }
-
-struct DetailedArtist: Codable, Identifiable {
+struct Artist: Codable, Identifiable {
     let name: String
     let popularity: Int
     let genres: [String]
-    let id = UUID()
+    let id: String
 }
 
 
@@ -78,7 +76,7 @@ class SpotifyService {
             do {
                 /*
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    print("🔵 Raw JSON response:\n\(jsonString)")
+                    print(" Raw JSON response:\n\(jsonString)")
                 }
 */
                 let decoded = try JSONDecoder().decode(TopTracksResponse.self, from: data)
@@ -118,16 +116,17 @@ class SpotifyService {
                return
            }
            do {
-              /* if let jsonString = String(data: data, encoding: .utf8) {
+            /*   if let jsonString = String(data: data, encoding: .utf8) {
                    print(" Raw JSON response:\n\(jsonString)")
                }
 */
                let decoded = try JSONDecoder().decode(TopArtistsResponse.self, from: data)
-               let artists = decoded.items.map { artist in
+              /* let artists = decoded.items.map { artist in
                               Artist(
                                   name: artist.name
                               )
                           }
+               */
                completion(decoded.items)
            } catch {
                print("Decoding failed: \(error)")
