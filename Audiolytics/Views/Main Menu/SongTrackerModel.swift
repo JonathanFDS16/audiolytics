@@ -20,10 +20,8 @@ struct TrackInfo {
         @Published var recentTracks: [TrackInfo] = []
         
         func fetchNowOrLastPlayed(token: String) async {
-            let didGetCurrent = await fetchCurrentlyPlaying(token: token)
-            if !didGetCurrent {
-                _ = await fetchRecentlyPlayed(token: token)
-            }
+            _ = await fetchCurrentlyPlaying(token: token)
+            _ = await fetchRecentlyPlayed(token: token)
         }
         
         private func fetchCurrentlyPlaying(token: String) async -> Bool {

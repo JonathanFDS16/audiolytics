@@ -131,14 +131,11 @@ struct MainMenuView: View {
                 )
                 .onAppear {
                     Task {
-                        await songTracker.fetchNowOrLastPlayed(
-                            token: accessToken)
-                        if let name = await songTracker.fetchUsername(
-                            token: accessToken)
-                        {
+                        await songTracker.fetchNowOrLastPlayed(token: accessToken)
+                        if let name = await songTracker.fetchUsername(token: accessToken) {
                             username = name
-                            print("Fetched username: \(name)")
                         }
+                        print("recentTracks count:", songTracker.recentTracks.count)
                     }
                 }
 
