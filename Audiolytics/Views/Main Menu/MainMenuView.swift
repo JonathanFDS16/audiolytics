@@ -7,133 +7,113 @@
 import SwiftUI
 import Foundation
 
-
 struct MainMenuView: View {
-    @State private var token: String = ""
     let accessToken: String
-    @State private var listeningData: [[ListeningData]] = []
     @State private var username: String = "User"
-    @State private var nowPlaying: TrackInfo?
-    @StateObject private var songTracker = SongTrackerModel()
+    @StateObject private var songTracker: SongTrackerModel
 
-
+    init(accessToken: String, songTracker: SongTrackerModel) {
+        self.accessToken = accessToken
+        _songTracker = StateObject(wrappedValue: songTracker)
+        //Username field broke, will fix later
+        print("Initialized MainMenuView with username: \(username)")
+    }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Welcome, \(username)")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                        .padding(.leading, 50)
-                    
-                    if let track = songTracker.nowPlaying {
+            NavigationStack {
+                GeometryReader { geo in
+                    VStack(spacing: 24) {
+                        Text("Welcome, \(username)")
+                            .font(.title)
+                            .foregroundColor(.primary)
+
+                        if let track = songTracker.nowPlaying {
+                            PlayerView(track: track)
+                        }
+
                         HStack(spacing: 16) {
-                            if let url = track.albumArtURL {
-                                AsyncImage(url: url) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    Color.gray
-                                }
-                                .frame(width: 60, height: 60)
-                                .cornerRadius(8)
+                            NavigationLink(destination: WrappedView()) {
+                                CardView(title: "Weekly Wrapped", icon: "calendar")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
 
-                            VStack(alignment: .leading) {
-                                Text(track.name)
-                                    .font(.headline)
-                                Text(track.artist)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                if !track.isPlaying, let playedAt = track.playedAt {
-                                    Text("Last played: \(playedAt.formatted(date: .abbreviated, time: .shortened))")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                } else {
-                                    Text("Now Playing")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
+                            VStack(spacing: 16) {
+                                NavigationLink(destination: PlaceholderView()) {
+                                    CardView(title: "Placeholder", icon: "waveform")
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                }
+
+                                NavigationLink(destination: MusicDiscoveryView()) {
+                                    CardView(title: "Music Discovery", icon: "sparkles")
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 }
                             }
+                            .frame(maxWidth: .infinity)
                         }
+                        .frame(height: geo.size.height * 0.35)
                         .padding(.horizontal)
                     }
-
-                
-                    WidgetCard(title: "Weekly Wrapped", icon: "calendar") {
-                        WrappedView()
-                    }
-
-                    WidgetCard(title: "Listening Habits", icon: "waveform") {
-                        ListeningHabitsView(allData: listeningData)
-                    }
-
-                    WidgetCard(title: "Music Discovery", icon: "sparkles") {
-                        MusicDiscoveryView()
-                    }
-                }
-                .padding(.vertical)
-            }
-            .navigationTitle("Audiolytics")
-            .task {
-                    var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me")!)
-                    request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-
-                    do {
-                        let (data, _) = try await URLSession.shared.data(for: request)
-                        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                           let name = json["display_name"] as? String {
-                            username = name
+                    .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
+                    .onAppear {
+                        Task {
+                            await songTracker.fetchNowOrLastPlayed(token: accessToken)
                         }
-                    } catch {
-                        print("Failed to fetch user profile:", error.localizedDescription)
-                    }
-                        await songTracker.fetchNowOrLastPlayed(token: accessToken)
                     }
 
                 }
+                .navigationTitle("Audiolytics")
             }
         }
+    }
 
-    
-
-#Preview {
-    MainMenuView(accessToken: "fakeTokenForTesting")
-}
-
-struct WidgetCard<Destination: View>: View {
+struct CardView: View {
     var title: String
     var icon: String
-    var destination: () -> Destination
 
     var body: some View {
-        NavigationLink(destination: destination()) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .frame(width: 50, height: 50)
-                    .background(Color.blue)
-                    .clipShape(Circle())
+        HStack {
+            Image(systemName: icon)
+                .font(.title)
+                .foregroundColor(.white)
+                .frame(width: 50, height: 50)
+                .background(Color.blue)
+                .clipShape(Circle())
 
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+            Text(title)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
 
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-            )
-            .padding(.horizontal)
+            Spacer()
         }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
     }
 }
 
+
+extension SongTrackerModel {
+    static var mockWithTrack: SongTrackerModel {
+        let model = SongTrackerModel()
+        model.nowPlaying = TrackInfo(
+            name: "Mock Song",
+            artist: "Mock Artist",
+            albumArtURL: URL(string: "https://via.placeholder.com/120"),
+            isPlaying: false,
+            playedAt: Date()
+        )
+        return model
+    }
+}
+
+#Preview {
+    MainMenuView(
+        accessToken: "fakeTokenForTesting",
+        songTracker: SongTrackerModel.mockWithTrack
+    )
+}
