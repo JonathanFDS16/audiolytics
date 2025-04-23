@@ -15,27 +15,27 @@ struct MainMenuView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Welcome, \(username)")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                        .padding(.leading, 50)
-                
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Welcome, \(username)")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 50)
+              //  HStack{
                     WidgetCard(title: "Weekly Wrapped", icon: "calendar") {
-                        WrappedView()
+                        TopView()
                     }
-
-                    WidgetCard(title: "Listening Habits", icon: "waveform") {
-                        ListeningHabitsView(allData: listeningData)
-                    }
-
+                    .frame(width: 250, height: 250)
+                    
+                   // WidgetCard(title: "Listening Habits", icon: "waveform") {
+                    //    ListeningHabitsView(allData: listeningData)
+                 //   }
+                    
                     WidgetCard(title: "Music Discovery", icon: "sparkles") {
                         MusicDiscoveryView()
                     }
                 }
+         //  }
                 .padding(.vertical)
-            }
             .navigationTitle("Audiolytics")
             .task {
                     var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me")!)
