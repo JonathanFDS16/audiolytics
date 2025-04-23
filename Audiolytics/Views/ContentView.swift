@@ -15,7 +15,7 @@ struct ContentView: View {
 
     var body: some View {
         if isLoggedIn, let token = accessToken {
-            MainMenuView(accessToken: token)
+            MainMenuView(accessToken: token, songTracker: SongTrackerModel())
             /* Text("Code: \(code)")
                     .padding()
                  */
