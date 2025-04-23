@@ -15,3 +15,9 @@ struct WrappedView: View {
         .navigationTitle("Weekly Wrapped")
     }
 }
+
+#Preview {
+    NavigationStack {
+        WrappedView()
+    }
+}

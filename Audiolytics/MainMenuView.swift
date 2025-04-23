@@ -17,6 +17,7 @@ struct MainMenuView: View {
             VStack(spacing: 30) {
                 NavigationLink("Weekly Wrapped", destination: WrappedView())
                 NavigationLink("Listening Habits", destination: ListeningHabitsView(allData: listeningData))
+                NavigationLink("Music Discovery", destination: MusicDiscoveryView())
                 
 /* WIP Data retrieval
                 if !listeningData.isEmpty {
