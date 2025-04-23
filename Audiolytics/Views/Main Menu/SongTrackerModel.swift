@@ -17,6 +17,7 @@ struct TrackInfo {
     @MainActor
     class SongTrackerModel: ObservableObject {
         @Published var nowPlaying: TrackInfo?
+        @Published var recentTracks: [TrackInfo] = []
         
         func fetchNowOrLastPlayed(token: String) async {
             let didGetCurrent = await fetchCurrentlyPlaying(token: token)
@@ -56,7 +57,7 @@ struct TrackInfo {
         }
         
         private func fetchRecentlyPlayed(token: String) async -> Bool {
-            var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me/player/recently-played?limit=1")!)
+            var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me/player/recently-played?limit=10")!)
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
             do {
@@ -67,31 +68,53 @@ struct TrackInfo {
                         return false
                     }
 
-                    let first = items[0]
-
-                    guard let playedAtStr = first["played_at"] as? String,
-                          let track = first["track"] as? [String: Any],
-                          let name = track["name"] as? String,
-                          let artists = track["artists"] as? [[String: Any]],
-                          let firstArtist = artists.first?["name"] as? String,
-                          let album = track["album"] as? [String: Any],
-                          let images = album["images"] as? [[String: Any]],
-                          let imageURL = images.first?["url"] as? String else {
-                        print("Failed to extract track info from recently played response.")
-                        return false
-                    }
-
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                    let playedAt = formatter.date(from: playedAtStr)
 
-                    self.nowPlaying = TrackInfo(
-                        name: name,
-                        artist: firstArtist,
-                        albumArtURL: URL(string: imageURL),
-                        isPlaying: false,
-                        playedAt: playedAt
-                    )
+                    if let first = items.first,
+                       let playedAtStr = first["played_at"] as? String,
+                       let track = first["track"] as? [String: Any],
+                       let name = track["name"] as? String,
+                       let artists = track["artists"] as? [[String: Any]],
+                       let firstArtist = artists.first?["name"] as? String,
+                       let album = track["album"] as? [String: Any],
+                       let images = album["images"] as? [[String: Any]],
+                       let imageURL = images.first?["url"] as? String {
+                        
+                        let playedAt = formatter.date(from: playedAtStr)
+
+                        self.nowPlaying = TrackInfo(
+                            name: name,
+                            artist: firstArtist,
+                            albumArtURL: URL(string: imageURL),
+                            isPlaying: false,
+                            playedAt: playedAt
+                        )
+                    }
+
+                    self.recentTracks = items.compactMap { item in
+                        guard let playedAtStr = item["played_at"] as? String,
+                              let track = item["track"] as? [String: Any],
+                              let name = track["name"] as? String,
+                              let artists = track["artists"] as? [[String: Any]],
+                              let firstArtist = artists.first?["name"] as? String,
+                              let album = track["album"] as? [String: Any],
+                              let images = album["images"] as? [[String: Any]],
+                              let imageURL = images.first?["url"] as? String else {
+                            return nil
+                        }
+
+                        let playedAt = formatter.date(from: playedAtStr)
+
+                        return TrackInfo(
+                            name: name,
+                            artist: firstArtist,
+                            albumArtURL: URL(string: imageURL),
+                            isPlaying: false,
+                            playedAt: playedAt
+                        )
+                    }
+
                     return true
                 }
             } catch {
@@ -99,6 +122,8 @@ struct TrackInfo {
             }
             return false
         }
+
+
 
         
         func fetchUsername(token: String) async -> String? {
