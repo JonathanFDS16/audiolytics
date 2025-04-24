@@ -9,11 +9,18 @@ import SwiftUI
 
 struct SearchView: View {
     @State private var searchText = ""
-    @State private var searchFor = ""
+    @State private var searchFor = "track"
     @State private var tracks: [TrackObject] = []
     @State private var albums: [SimplifiedAlbumObject] = []
     @State private var artists: [ArtistObject] = []
     @State private var showResults = false
+    @State private var noResultsFound = false
+    //@State private var showPlaylistGen = false
+    @State private var playlistTrackURIs: [String] = []
+    @State private var playlistTrackURIsToSend: [String]? = nil
+    @State private var playlistDataToSend: PlaylistData? = nil
+
+
     
     var body: some View {
         VStack {
@@ -34,13 +41,17 @@ struct SearchView: View {
                         let params = SpotifySearchParams(type: searchFor, year: year, genre: genre, keyword: keyword, tag: newAlbum ? "new" : hipster ? "hipster" : nil)
                         
                         let accessToken = UserDefaults.standard.string(forKey: "access_token") ?? ""
+                        guard !accessToken.isEmpty else {
+                            print("There's a missing access token")
+                            return
+                        }
                         
                         searchSpotifyItems(with: params, accessToken: accessToken) { result in
                             
                             switch result {
                             case .success(let data):
                                 if let jsonString = String(data: data, encoding: .utf8) {
-                                    print("✅ Pretty JSON:\n\(jsonString)")
+                                    print("Pretty JSON:\n\(jsonString)")
                                 }
                                 DispatchQueue.main.async {
                                     do {
@@ -48,24 +59,33 @@ struct SearchView: View {
                                         case "album":
                                             let decoded = try JSONDecoder().decode(AlbumSearchResponse.self, from: data)
                                             self.albums = decoded.albums.items
+                                            self.noResultsFound = decoded.albums.items.isEmpty
+                                            
                                         case "track":
                                             let decoded = try JSONDecoder().decode(TrackSearchResponse.self, from: data)
                                             self.tracks = decoded.tracks.items
+                                            self.noResultsFound = decoded.tracks.items.isEmpty
+                                            
                                         case "artist":
                                             let decoded = try JSONDecoder().decode(ArtistsSearchResponse.self, from: data)
                                             self.artists = decoded.artists.items
+                                            self.noResultsFound = decoded.artists.items.isEmpty
+                                            
                                         default:
                                             break
                                         }
+                                        
                                         withAnimation {
                                             self.showResults = true
                                         }
+                                        
                                     } catch {
-                                        print("❌ Decode error: \(error)")
+                                        print("Decode error: \(error)")
                                     }
                                 }
+                                
                             case .failure(let error):
-                                print("❌ Search failed: \(error.localizedDescription)")
+                                print("Search failed: \(error.localizedDescription)")
                                 
                             }
                         }
@@ -77,6 +97,13 @@ struct SearchView: View {
             if showResults {
                 Text("What we got for you")
                     .font(.headline)
+                if noResultsFound {
+                    Text("No results found. Try again with a different keyword or filter.")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .padding()
+                }
+                
                 if searchFor == "track" {
                     List {
                         ForEach(tracks, id: \.id) { track in
@@ -87,8 +114,8 @@ struct SearchView: View {
                                 } placeholder: {
                                     ProgressView()
                                 }
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                .frame(width: 50, height: 50)
+                                .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
                                 Text(track.name)
                             }
                         }
@@ -104,8 +131,8 @@ struct SearchView: View {
                                 } placeholder: {
                                     ProgressView()
                                 }
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                .frame(width: 50, height: 50)
+                                .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
                                 Text(track.name)
                             }
                         }
@@ -121,13 +148,25 @@ struct SearchView: View {
                                 } placeholder: {
                                     ProgressView()
                                 }
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                .frame(width: 50, height: 50)
+                                .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
                                 Text(track.name)
                             }
                         }
                     }
                     .listStyle(.plain)
+                }
+                if searchFor == "track" && !tracks.isEmpty {
+                    Button("Make this a playlist") {
+                        let uris = tracks.map { "spotify:track:\($0.id)" }
+                        print("📦 Opening sheet with URIs: \(uris)")
+                        playlistDataToSend = PlaylistData(uris: uris)
+                    }
+
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
                 }
                 Button("Go back to search") {
                     withAnimation {
@@ -137,8 +176,19 @@ struct SearchView: View {
                 .padding()
             }
         }
+        .sheet(item: $playlistDataToSend) { data in
+            PlaylistGenView(
+                accessToken: UserDefaults.standard.string(forKey: "access_token") ?? "",
+                uris: data.uris,
+                onFinished: {
+                    playlistDataToSend = nil
+                }
+            )
+        }
+
     }
 }
+
 
 struct SpotifySearchParams {
     let type: String          // "track", "album", or "artist"
@@ -221,4 +271,9 @@ func searchSpotifyItems(
 
 #Preview {
     SearchView()
+}
+
+struct PlaylistData: Identifiable {
+    let id = UUID()  // required for .sheet(item:)
+    let uris: [String]
 }
