@@ -69,16 +69,16 @@ struct SavedPlaylistView: View {
         SpotifyPlaylist(
             id: "1",
             name: "Audiolytics: Tester",
-            images: [SpotifyImage(url: URL(string: "https://via.placeholder.com/111")!)]
+            images: [PlaylistImage(url: URL(string: "https://via.placeholder.com/111")!)]
         ),
         SpotifyPlaylist(
             id: "2",
             name: "Audiolytics: Aaa",
-            images: [SpotifyImage(url: URL(string: "https://via.placeholder.com/999")!)]
+            images: [PlaylistImage(url: URL(string: "https://via.placeholder.com/999")!)]
         )
     ]
 
-    return NavigationStack {
+    NavigationStack {
         List(mockPlaylists) { playlist in
             HStack {
                 if let url = playlist.imageURL {

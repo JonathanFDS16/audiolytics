@@ -53,6 +53,15 @@ struct MainMenuView: View {
                 }
             }
             .navigationTitle("Audiolytics")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape")
+                            .imageScale(.large)
+                    }
+                }
+            }
+
         }
     }
 }

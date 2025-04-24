@@ -13,17 +13,16 @@ struct PlaylistResponse: Codable {
 struct SpotifyPlaylist: Identifiable, Codable {
     let id: String
     let name: String
-    let images: [SpotifyImage]
+    let images: [PlaylistImage]
 
     var imageURL: URL? {
         images.first?.url
     }
 }
 
-struct SpotifyImage: Codable {
+struct PlaylistImage: Codable {
     let url: URL
 }
-
 
 class PlaylistBuilder {
 

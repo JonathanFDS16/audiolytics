@@ -74,7 +74,7 @@ struct PlaylistGenView: View {
 
 #Preview {
     PlaylistGenView(
-        accessToken: "mock_token",
+        accessToken: "sometoken",
         uris: [
             "spotify:track:mock1",
             "spotify:track:mock2",
