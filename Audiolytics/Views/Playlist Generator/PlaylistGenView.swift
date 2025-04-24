@@ -60,6 +60,7 @@ struct PlaylistGenView: View {
             let success = await PlaylistBuilder.addTracks(token: accessToken, playlistID: playlistID, uris: uris)
             if success {
                 statusMessage = "Playlist created!"
+                PlaylistBuilder.saveCreatedPlaylistID(playlistID, forUser: userID)
                 onFinished()
             } else {
                 statusMessage = "Could not add tracks."

@@ -54,6 +54,11 @@ struct SavedPlaylistView: View {
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
             let decoded = try JSONDecoder().decode(PlaylistResponse.self, from: data)
+            
+            print("Retrieved playlists from API:")
+            for item in decoded.items {
+                print("ID: \(item.id), Name: \(item.name)")
+            }
 
             guard let userID = await PlaylistBuilder.fetchUserID(token: accessToken) else {
                 print("Could not retrieve user ID")
@@ -62,6 +67,7 @@ struct SavedPlaylistView: View {
 
             let savedIDs = Set(PlaylistBuilder.getSavedPlaylistIDs(forUser: userID))
             playlists = decoded.items.filter { savedIDs.contains($0.id) }
+            print("Filtered Playlists: \(playlists.map { $0.name })")
         } catch {
             errorMessage = "Failed to load playlists: \(error.localizedDescription)"
         }

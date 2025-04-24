@@ -9,10 +9,6 @@ import Charts
 
 struct Breakdown: View {
    
- 
-    
-    
-    
     let genres = ["Pop", "Rock", "Hip Hop", "EDM", "Classical"]
     
     var body: some View {

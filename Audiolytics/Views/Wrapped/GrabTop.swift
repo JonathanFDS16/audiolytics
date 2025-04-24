@@ -17,6 +17,7 @@ struct TopArtistsResponse: Codable {
 struct Track: Codable, Identifiable {
     let name: String
     let artists: [SimpleArtist]
+    let uri: String
     let id = UUID()
 }
 

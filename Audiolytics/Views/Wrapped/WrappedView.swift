@@ -6,17 +6,17 @@
 //
 import SwiftUI
 
-struct DataTestView: View{
-    var body: some View{
-        HStack{
-            Text("Top artists")
-            
-        }
-    }
-}
+
+
+
+
+
+
 struct WrappedView: View {
+    
+    
     //all placeholders
-    private var colorsArr: [Color] = [.red, .green, .yellow, .blue]
+   private var colorsArr: [Color] = [.red, .green, .yellow, .blue]
     
        var body: some View {
            ScrollView(.horizontal, showsIndicators: true) {
@@ -38,6 +38,7 @@ struct WrappedView: View {
            .contentMargins(50, for: .scrollContent)
            .scrollTargetBehavior(.viewAligned)
        }
+    
 }
 
 #Preview {
