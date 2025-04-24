@@ -67,6 +67,7 @@ struct PlayerView: View {
         artist: "Mock Artist",
         albumArtURL: URL(string: "https://via.placeholder.com/120"),
         isPlaying: false,
-        playedAt: Date()
+        playedAt: Date(),
+        uri: "spotify:track:mockuri"
     ))
 }
