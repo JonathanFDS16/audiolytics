@@ -14,7 +14,7 @@ struct FeatureGridView: View {
     var body: some View {
         HStack(spacing: 16) {
             NavigationLink(destination: TopView()) {
-                CardView(title: "Weekly Wrapped", icon: "calendar")
+                CardView(title: "Wrapped", icon: "calendar")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
