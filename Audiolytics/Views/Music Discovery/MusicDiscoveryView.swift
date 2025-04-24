@@ -29,7 +29,8 @@ struct MusicDiscoveryView: View {
                                 isSearching = true
                             }
                         }
-                    Text("Why not discover something different?")
+                    Text("Escape the Algorithm and explore something different!")
+                        .multilineTextAlignment(.center)
                         .padding()
                 }
                 .transition(.slide)
