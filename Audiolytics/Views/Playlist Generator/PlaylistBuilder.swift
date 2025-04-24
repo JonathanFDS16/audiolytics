@@ -9,7 +9,6 @@ import Foundation
 struct PlaylistResponse: Codable {
     let items: [SpotifyPlaylist]
 }
-
 struct SpotifyPlaylist: Identifiable, Codable {
     let id: String
     let name: String
@@ -19,7 +18,6 @@ struct SpotifyPlaylist: Identifiable, Codable {
         images.first?.url
     }
 }
-
 struct PlaylistImage: Codable {
     let url: URL
 }
@@ -66,7 +64,7 @@ class PlaylistBuilder {
             let (data, _) = try await URLSession.shared.data(for: request)
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             if let playlistID = json?["id"] as? String {
-                saveCreatedPlaylistID(playlistID)
+                saveCreatedPlaylistID(playlistID, forUser: userID)
                 return playlistID
             }
         } catch {
@@ -105,15 +103,17 @@ class PlaylistBuilder {
         }
     }
 
-    static func saveCreatedPlaylistID(_ id: String) {
-        var stored = UserDefaults.standard.stringArray(forKey: "audiolyticsPlaylists") ?? []
+    static func saveCreatedPlaylistID(_ id: String, forUser userID: String) {
+        let key = "audiolyticsPlaylists_\(userID)"
+        var stored = UserDefaults.standard.stringArray(forKey: key) ?? []
         if !stored.contains(id) {
             stored.append(id)
-            UserDefaults.standard.set(stored, forKey: "audiolyticsPlaylists")
+            UserDefaults.standard.set(stored, forKey: key)
         }
     }
 
-    static func getSavedPlaylistIDs() -> [String] {
-        UserDefaults.standard.stringArray(forKey: "audiolyticsPlaylists") ?? []
+    static func getSavedPlaylistIDs(forUser userID: String) -> [String] {
+        let key = "audiolyticsPlaylists_\(userID)"
+        return UserDefaults.standard.stringArray(forKey: key) ?? []
     }
 }

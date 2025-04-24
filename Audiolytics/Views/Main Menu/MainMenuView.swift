@@ -53,7 +53,8 @@ struct MainMenuView: View {
                 }
             }
             .navigationTitle("Audiolytics")
-            .toolbar {
+            //May or may not return to it
+          /*  .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape")
@@ -61,6 +62,7 @@ struct MainMenuView: View {
                     }
                 }
             }
+           */
 
         }
     }
@@ -68,7 +70,7 @@ struct MainMenuView: View {
 
 #Preview {
     MainMenuView(
-        accessToken: "mock_token",
+        accessToken: "cooltoken",
         songTracker: SongTrackerModel.mockWithTrack
     )
 }

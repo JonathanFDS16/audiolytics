@@ -54,46 +54,18 @@ struct SavedPlaylistView: View {
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
             let decoded = try JSONDecoder().decode(PlaylistResponse.self, from: data)
-            let savedIDs = Set(PlaylistBuilder.getSavedPlaylistIDs())
+
+            guard let userID = await PlaylistBuilder.fetchUserID(token: accessToken) else {
+                print("Could not retrieve user ID")
+                return
+            }
+
+            let savedIDs = Set(PlaylistBuilder.getSavedPlaylistIDs(forUser: userID))
             playlists = decoded.items.filter { savedIDs.contains($0.id) }
         } catch {
             errorMessage = "Failed to load playlists: \(error.localizedDescription)"
         }
 
         isLoading = false
-    }
-}
-
-#Preview {
-    let mockPlaylists = [
-        SpotifyPlaylist(
-            id: "1",
-            name: "Audiolytics: Tester",
-            images: [PlaylistImage(url: URL(string: "https://via.placeholder.com/111")!)]
-        ),
-        SpotifyPlaylist(
-            id: "2",
-            name: "Audiolytics: Aaa",
-            images: [PlaylistImage(url: URL(string: "https://via.placeholder.com/999")!)]
-        )
-    ]
-
-    NavigationStack {
-        List(mockPlaylists) { playlist in
-            HStack {
-                if let url = playlist.imageURL {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        Color.gray
-                    }
-                    .frame(width: 50, height: 50)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
-
-                Text(playlist.name)
-            }
-        }
-        .navigationTitle("Saved Playlists")
     }
 }
