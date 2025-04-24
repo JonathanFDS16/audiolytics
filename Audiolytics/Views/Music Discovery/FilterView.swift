@@ -98,6 +98,7 @@ struct TrackFilterView: View {
             Button(action: {
                 completion(yearRange, selectedGenre, keyword, false, false)
                 yearRange = ""//TODO fix this
+                keyword = ""
                 
             }) {
                 Text("Search")

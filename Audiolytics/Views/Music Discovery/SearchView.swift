@@ -24,8 +24,8 @@ struct SearchView: View {
                         .padding()
                     Picker("Search by", selection: $searchFor) {
                         Text("Artist").tag("artist")
-                        Text("Album").tag("album")
                         Text("Song").tag("track")
+                        Text("Album").tag("album")
                     }
                     .pickerStyle(.segmented)
                     .animation(.easeInOut, value: searchFor)
@@ -39,6 +39,9 @@ struct SearchView: View {
                             
                             switch result {
                             case .success(let data):
+                                if let jsonString = String(data: data, encoding: .utf8) {
+                                    print("✅ Pretty JSON:\n\(jsonString)")
+                                }
                                 DispatchQueue.main.async {
                                     do {
                                         switch searchFor {
@@ -155,22 +158,44 @@ func searchSpotifyItems(
     if let keyword = params.keyword {
         queryItems.append(keyword)
     }
-    if let genre = params.genre {
-        queryItems.append("genre:\"\(genre)\"")
-    }
     if let year = params.year {
-        queryItems.append("year:\(year)")
+        print("Appeding-> year:\(year)")
+        if year == "" {
+            queryItems.append("year:2025")
+        }
+        else {
+            queryItems.append("year:\(year)")
+        }
     }
-    if let tag = params.tag {
-        queryItems.append("tag:\(tag)")
+    
+    //only artist and tracks
+    if params.type == "artist" || params.type == "track" {
+        if let genre = params.genre {
+            queryItems.append("genre:\"\(genre)\"")
+        }
     }
+    
+    //albums only
+    if params.type == "album" {
+        if let tag = params.tag {
+            queryItems.append("tag:\(tag)")
+        }
+    }
+    
+    /**
+    Artist -->  Keyword, Year, genre
+     Albums--> Keyword, Year, tag
+     Track --> Keyword, Year, genre
+     */
+    
+    let randomOffset = Int.random(in: 0..<200)
     
     let query = queryItems.joined(separator: " ")
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
     
     print("Query: \(query)")
     
-    guard let url = URL(string: "https://api.spotify.com/v1/search?q=\(query)&type=\(params.type)&limit=20") else {
+    guard let url = URL(string: "https://api.spotify.com/v1/search?q=\(query)&type=\(params.type)&limit=20&market=US&offset=\(randomOffset)") else {
         completion(.failure(NSError(domain: "InvalidURL", code: -1)))
         return
     }
