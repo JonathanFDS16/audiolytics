@@ -42,6 +42,6 @@ struct WrappedView: View {
 
 #Preview {
     NavigationStack {
-        DataTestView()
+        WrappedView()
     }
 }
