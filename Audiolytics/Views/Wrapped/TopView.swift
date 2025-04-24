@@ -46,6 +46,7 @@ struct TopView: View {
     @State private var popularityList: [Int] = []
     @State private var timeFrame: String = "short_term"
     @State private var limit: Int = 10
+    @State private var obscureScore: Int = 0
     
     func fetchTopTracks() {
         SpotifyService().getTopTracks(timeRange: timeFrame, limitNum: limit) { tracks in
@@ -72,17 +73,15 @@ struct TopView: View {
                 print(genreList)
                 self.popularityList = artists.map { $0.popularity }
                 print(popularityList)
+                let popSum = popularityList.reduce(0, +)
+                let length = popularityList.count
+                let avgPop = Double(popSum)/Double(length)
+                let obscurityScore = (Int)(100.0 - avgPop)
+                obscureScore = obscurityScore
             }
         }
     }
-    func getObscurity(){
-        fetchGenres()
-        let popSum = popularityList.reduce(0, +)
-        let length = popularityList.count
-        let avgPop = Double(popSum)/Double(length)
-        let obscurityScore = (Int)(100.0 - avgPop)
-        print(obscurityScore)
-    }
+    
     
     
     var body: some View {
@@ -125,7 +124,7 @@ struct TopView: View {
                                     }
                                 }
                             ),
-                            gradient: LinearGradient(gradient: Gradient(colors: [.blue, .white, .blue]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
+                            gradient: LinearGradient(gradient: Gradient(colors: [.blue, .green]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
                             
                             
                         )
@@ -152,7 +151,7 @@ struct TopView: View {
                                     }
                                 }
                             ),
-                            gradient: LinearGradient(gradient: Gradient(colors: [.purple, .white, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
+                            gradient: LinearGradient(gradient: Gradient(colors: [.pink, .orange]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
                             
                         )
                         .padding(.vertical)
@@ -186,7 +185,7 @@ struct TopView: View {
                                 }
                             ),
                             
-                            gradient: LinearGradient(gradient: Gradient(colors: [.pink, .white, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                            gradient: LinearGradient(gradient: Gradient(colors: [.yellow, .white]), startPoint: .topLeading, endPoint: .bottomTrailing)
                             
                         )
                         .scrollTransition { content, phase in
@@ -197,15 +196,41 @@ struct TopView: View {
                         
                         InfoCard(title: "My Wrapped",
                                  content: AnyView(
-                                    VStack(alignment: .leading) {
+                                    VStack() {
                                         
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                    }),
+                                        // Top Tracks Section
+                                        VStack() {
+                                            Text("Top Tracks")
+                                                .font(.title2)
+                                                .bold()
+                                            
+                                            ForEach(Array(topTracks.prefix(5).enumerated()), id: \.element.id) { index, track in
+                                                Text("\(index + 1). \(track.name) – \(track.artists.map { $0.name }.joined(separator: ", "))")
+                                                    .font(.headline)
+                                            }
+                                        }
+                                        .padding()
+                                        // Top Artists Section
+                                        VStack() {
+                                            Text("Top Artists")
+                                                .font(.title2)
+                                                .bold()
+                                            
+                                            ForEach(Array(topArtists.prefix(5).enumerated()), id: \.element.id) { index, artist in
+                                                Text("\(index + 1). \(artist.name)")
+                                                    .font(.headline)
+                                                
+                                            }
+                                        }
+                                    
+                                    .padding()
+                                        VStack(){
+                                            Spacer()
+                                            Text("Obscurity Score: \(obscureScore)")
+                                        }
+                                        }
+                                   
+                                 ),
                                  gradient: LinearGradient(gradient: Gradient(colors: [.blue, .purple, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing)).scrollTransition { content, phase in
                             content
                                 .opacity(phase.isIdentity ? 1 : 0.5)
