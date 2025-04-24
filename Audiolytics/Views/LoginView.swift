@@ -24,7 +24,7 @@ struct LoginView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 //Placeholder text, sorry I have 0 creativity
-                Text("Enchance your listening experience")
+                Text("Enhance your listening experience")
                     .foregroundColor(.white.opacity(0.8))
                     .font(.headline)
 
