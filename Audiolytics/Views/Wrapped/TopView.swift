@@ -10,8 +10,9 @@ struct TopView: View {
     @State private var topArtists: [Artist] = []
     @State private var topTracks: [Track] = []
     @State private var genreList: [String] = []
+    @State private var popularityList: [Int] = []
     @State private var timeFrame: String = "short_term"
-    @State private var limit: Int = 5
+    @State private var limit: Int = 10
     
     func fetchTopTracks() {
         SpotifyService().getTopTracks(timeRange: timeFrame, limitNum: limit) { tracks in
@@ -33,116 +34,126 @@ struct TopView: View {
         SpotifyService().getTopArtists(timeRange: timeFrame, limitNum: limit) { artists in
             DispatchQueue.main.async {
                 self.topArtists = artists
-                let genres = artists.compactMap { $0.genres }.flatMap { $0 }
-                           self.genreList = Array(Set(genres)).sorted()
-                           print("Genres: \(self.genreList)")
+                genreList = artists.compactMap { $0.genres }.flatMap { $0 }
+                print(genreList)
+                self.popularityList = artists.map { $0.popularity }
+                print(popularityList)
             }
         }
         
         
     }
+    func getObscurity(){
+        fetchGenres()
+        var popSum = popularityList.reduce(0, +)
+        var length = popularityList.count
+        var avgPop = Double(popSum)/Double(length)
+        var obscurityScore = (Int)(100.0 - avgPop)
+        print(obscurityScore)
+    }
     
-
+    
     var body: some View {
-        VStack() {
-            Text("App")
-       
-            HStack(){
+        ScrollView{
+            VStack() {
+                Text("App")
                 
-                //do segmented picker instead?
-                Button("short"){
-                timeFrame = "short_term"
-                    fetchTopTracks()
-                    fetchTopArtists()
+                HStack(){
+                    
+                    //do segmented picker instead?
+                    Button("short"){
+                        timeFrame = "short_term"
+                        fetchTopTracks()
+                        fetchTopArtists()
+                    }
+                    Button("med")
+                    {
+                        timeFrame = "medium_term"
+                        fetchTopTracks()
+                        fetchTopArtists()
+                    }
+                    Button("long"){
+                        timeFrame = "long_term"
+                        fetchTopTracks()
+                        fetchTopArtists()
+                    }
+                    /*Picker("Number of entries", selection: $limit)
+                     {
+                     ForEach(1...50, id: \.self) { number in
+                     Text("\(number)")
+                     }
+                     }
+                     pickerStyle(.wheel)
+                     */
+                    Button("10 entries")
+                    {
+                        limit = 10
+                        fetchTopTracks()
+                        fetchTopArtists()
+                    }
+                    
                 }
-                Button("med")
-                {
-                timeFrame = "medium_term"
-                    fetchTopTracks()
-                    fetchTopArtists()
+                
+                
+                VStack() {
+                    Text("Top Tracks")
+                        .font(.title)
+                        .padding(.bottom)
+                    
+                    if topTracks.isEmpty {
+                        Text("Loading...")
+                            .onAppear {
+                                fetchTopTracks()
+                            }
+                    } else {
+                        List(topTracks) { track in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(track.name)
+                                    .font(.headline)
+                                Text(" by " + track.artists.map { $0.name }.joined(separator: ", "))
+                            }
+                            
+                            .padding(.vertical, 4)
+                        }
+                        .listStyle(.plain)
+                    }
                 }
-                Button("long"){
-                timeFrame = "long_term"
-                    fetchTopTracks()
-                    fetchTopArtists()
-                }
-               /*Picker("Number of entries", selection: $limit)
-                {
-                    ForEach(1...50, id: \.self) { number in
-                           Text("\(number)")
-                       }
-                }
-                pickerStyle(.wheel)
-                */
-                Button("10 entries")
-                {
-                    limit = 10
-                    fetchTopTracks()
-                    fetchTopArtists()
-                }
-              
+                .padding()
+                
+                .frame(height: 350)
+                .padding()
             }
             
-           
-            VStack() {
-                       Text("Top Tracks")
-                           .font(.title)
-                           .padding(.bottom)
-
-                       if topTracks.isEmpty {
-                           Text("Loading...")
-                               .onAppear {
-                                   fetchTopTracks()
-                               }
-                       } else {
-                           List(topTracks) { track in
-                               VStack(alignment: .leading, spacing: 4) {
-                                   Text(track.name)
-                                       .font(.headline)
-                                   Text(" by " + track.artists.map { $0.name }.joined(separator: ", "))
-                               }
-                               
-                               .padding(.vertical, 4)
-                           }
-                           .listStyle(.plain)
-                       }
-                   }
-                   .padding()
-            
-            .frame(height: 350)
-            .padding()
-        }
-        
             VStack(alignment: .leading) {
-                       Text("Top Artists")
-                           .font(.title)
-                           .padding(.bottom)
-
-                       if topArtists.isEmpty {
-                           Text("Loading...")
-                               .onAppear {
-                                   fetchTopArtists()
-                               }
-                       } else {
-                           List(topArtists) { artist in
-                               VStack(alignment: .leading, spacing: 4) {
-                                   Text(artist.name)
-                                       .font(.headline)
-                               }
-                               .padding(.vertical, 4)
-                           }
-                           .listStyle(.plain)
-                       }
-                   }
-                   .padding()
+                Text("Top Artists")
+                    .font(.title)
+                    .padding(.bottom)
+                
+                if topArtists.isEmpty {
+                    Text("Loading...")
+                        .onAppear {
+                            fetchTopArtists()
+                        }
+                } else {
+                    List(topArtists) { artist in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(artist.name)
+                                .font(.headline)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .listStyle(.plain)
+                }
+            }
+            .padding()
             
             .frame(height: 350)
             .padding()
         }
-            
         
-        }
-    
+        
+    }
+}
 
     #Preview {
         TopView()
