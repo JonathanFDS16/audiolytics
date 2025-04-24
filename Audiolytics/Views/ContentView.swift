@@ -26,7 +26,6 @@ struct ContentView: View {
                         onSuccess: { code in
                             authCode = code
                             showAuth = false
-                            //  exchangeCodeForToken(code: authCode ?? "")
                             exchangeCodeForToken(code: authCode ?? "") {
                                 token in
                                 accessToken = token

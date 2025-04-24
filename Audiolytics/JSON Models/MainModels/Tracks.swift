@@ -7,6 +7,10 @@
 
 import Foundation
 
+struct TrackSearchResponse: Codable {
+    let tracks: Tracks
+}
+
 struct Tracks : Codable {
     let href : String
     let limit : Int

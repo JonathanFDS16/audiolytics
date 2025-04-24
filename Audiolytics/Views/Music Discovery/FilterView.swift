@@ -10,8 +10,7 @@ import SwiftUI
 struct TrackFilterView: View {
     @Binding var searchMode : String
     @State private var selectedGenre = "Hip-Hop"
-    @State private var yearRange: ClosedRange<Double> = 2000...2025
-    @State private var selectedYears: ClosedRange<Double> = 2010...2020
+    @State private var yearRange: String = ""
     @State private var keyword = ""
     
     @State private var showNewAlbumExplanation = false
@@ -20,14 +19,14 @@ struct TrackFilterView: View {
     @State private var hipster = false
     
     // completion with Year, Genre, Keyword, NewAlbum, Hipster
-    var completion : (Int, String, String, Bool, Bool) -> Void
+    var completion : (String, String, String, Bool, Bool) -> Void
 
     let genres = ["Hip-Hop", "Pop", "Rock", "Jazz", "Electronic", "Classical"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
 
-            if searchMode != "Album" {
+            if searchMode != "album" {
                 // Genre Picker
                 HStack(alignment: .center) {
                     Text("Genre")
@@ -41,11 +40,12 @@ struct TrackFilterView: View {
             }
 
             // Year Range Slider
-            VStack(alignment: .leading) {
-                Text("Year Range: \(Int(selectedYears.lowerBound)) - \(Int(selectedYears.upperBound))")
+            HStack(alignment: .center) {
+                Text("Year or Year Range")
+                TextField("e.g 2020 or 1950-2025", text: $yearRange)
             }
             
-            if searchMode != "Artist" {
+            if searchMode != "artist" {
                 // Keyword Input
                 HStack (alignment: .center) {
                     Text("Keyword")
@@ -55,7 +55,7 @@ struct TrackFilterView: View {
                 }
             }
             
-            if searchMode == "Album" {
+            if searchMode == "album" {
                 Toggle(isOn: $newAlbums) {
                     HStack {
                         Text("New Albums Only")
@@ -93,10 +93,9 @@ struct TrackFilterView: View {
 
             // Submit Button
             Button(action: {
-                completion(Int(selectedYears.lowerBound), selectedGenre, keyword, false, false) //TODO fix this
-                print("Genre: \(selectedGenre)")
-                print("Years: \(Int(selectedYears.lowerBound)) - \(Int(selectedYears.upperBound))")
-                print("Keyword: \(keyword)")
+                completion(yearRange, selectedGenre, keyword, false, false)
+                yearRange = ""//TODO fix this
+                
             }) {
                 Text("Search")
                     .fontWeight(.bold)
@@ -112,6 +111,6 @@ struct TrackFilterView: View {
 }
 
 #Preview {
-    @State @Previewable var searchMode: String = "Album"
+    @State @Previewable var searchMode: String = "Artist"
     TrackFilterView(searchMode: $searchMode) { _, _ ,_, _, _ in }
 }
