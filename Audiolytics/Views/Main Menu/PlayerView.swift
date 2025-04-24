@@ -63,10 +63,11 @@ struct PlayerView: View {
 
 #Preview {
     PlayerView(track: TrackInfo(
-        name: "Mock Song",
-        artist: "Mock Artist",
-        albumArtURL: URL(string: "https://via.placeholder.com/120"),
+        name: "Best Song Ever",
+        artist: "Nobody",
+        albumArtURL: URL(string: "https://via.placeholder.com/111"),
         isPlaying: false,
-        playedAt: Date()
+        playedAt: Date(),
+        uri: "spotify:track:aaaa"
     ))
 }

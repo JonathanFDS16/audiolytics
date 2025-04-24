@@ -9,12 +9,16 @@ import SwiftUI
 
 @main
 struct AudiolyticsApp: App {
+    @AppStorage("isDarkMode") private var isDarkMode = false
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(isDarkMode ? .dark : .light)
         }
     }
 }
+
 
 
 
