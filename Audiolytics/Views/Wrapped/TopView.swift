@@ -11,11 +11,11 @@ import Foundation
 struct InfoCard: View {
     let title: String
     let content: AnyView
-    let gradient: LinearGradient // Accept gradient as a parameter
+    let gradient: LinearGradient 
     
     var body: some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(gradient) // Use the passed gradient for the card's background
+            .fill(gradient)
             .shadow(radius: 5, x: 5, y: 5)
             .frame(width: UIScreen.main.bounds.width - 100, height: 500)
             .overlay(
@@ -28,7 +28,7 @@ struct InfoCard: View {
                     
                     Spacer()
                     
-                    content // This will be the content (tracks, artists, genres)
+                    content
                     
                     Spacer()
                 }
@@ -198,7 +198,6 @@ struct TopView: View {
                                  content: AnyView(
                                     VStack() {
                                         
-                                        // Top Tracks Section
                                         VStack() {
                                             Text("Top Tracks")
                                                 .font(.title2)
@@ -210,7 +209,6 @@ struct TopView: View {
                                             }
                                         }
                                         .padding()
-                                        // Top Artists Section
                                         VStack() {
                                             Text("Top Artists")
                                                 .font(.title2)
