@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AlmbumsSearchResponse: Codable {
+struct AlbumSearchResponse: Codable {
     let albums: Albums
 }
 

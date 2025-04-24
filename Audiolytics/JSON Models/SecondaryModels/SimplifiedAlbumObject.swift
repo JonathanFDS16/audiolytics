@@ -10,7 +10,7 @@ import Foundation
 struct SimplifiedAlbumObject: Codable {
     let albumType: String
     let artists: [SimplifiedArtistObject]
-    let availableMarkets: [String]
+    let availableMarkets: [String]?
     let externalUrls: ExternalUrls
     let href: String
     let id: String

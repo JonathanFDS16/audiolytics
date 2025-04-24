@@ -10,71 +10,132 @@ import SwiftUI
 struct SearchView: View {
     @State private var searchText = ""
     @State private var searchFor = ""
+    @State private var tracks: [TrackObject] = []
+    @State private var albums: [SimplifiedAlbumObject] = []
+    @State private var artists: [ArtistObject] = []
+    @State private var showResults = false
+    
     var body: some View {
         VStack {
-            VStack {
-                Text("Would you like to search for:")
-                Picker("Search by", selection: $searchFor) {
-                    Text("Artist").tag("artist")
-                    Text("Album").tag("album")
-                    Text("Song").tag("track")
-                }
-                .pickerStyle(.segmented)
-                
-                TrackFilterView(searchMode: $searchFor) { year, genre, keyword, newAlbum, hipster in
-                    let params = SpotifySearchParams(type: searchFor, year: year, genre: genre, keyword: keyword, tag: newAlbum ? "new" : hipster ? "hipster" : nil)
+            if !showResults {
+                VStack {
+                    Text("What would you like to search for:")
+                        .font(.headline)
+                        .padding()
+                    Picker("Search by", selection: $searchFor) {
+                        Text("Artist").tag("artist")
+                        Text("Song").tag("track")
+                        Text("Album").tag("album")
+                    }
+                    .pickerStyle(.segmented)
+                    .animation(.easeInOut, value: searchFor)
                     
-                    let accessToken = UserDefaults.standard.string(forKey: "access_token") ?? ""
-                    
-                    searchSpotifyItems(with: params, accessToken: accessToken) { result in
+                    TrackFilterView(searchMode: $searchFor) { year, genre, keyword, newAlbum, hipster in
+                        let params = SpotifySearchParams(type: searchFor, year: year, genre: genre, keyword: keyword, tag: newAlbum ? "new" : hipster ? "hipster" : nil)
                         
-                        switch result {
-                           case .success(let data):
-                               do {
-                                   if let jsonString = String(data: data, encoding: .utf8) {
-                                              print("✅ JSON String:\n\(jsonString)")
-                                    
-                                          } else {
-                                              print("❌ Failed to convert data to string.")
-                                }
-                                   // Needs to decode according to what I have searchedFor
-                                   if searchFor == "album" {
-                                       let decoded = try JSONDecoder().decode(AlmbumsSearchResponse.self, from: data)
-                                       print("\(decoded)")
-                                       let albums = decoded.albums.items
-                                       for album in albums {
-                                           print("🎵 \(album.name)")
-                                       }
-                                   }
-                                   else if searchFor == "track" {
-                                       let decoded = try JSONDecoder().decode(TrackSearchResponse.self, from: data)
-                                       print("\(decoded)")
-                                       let tracks = decoded.tracks.items
-                                       for track in tracks {
-                                           print("🎵 \(track.name)")
-                                       }                                   }
-                                   else {
-                                       let decoded = try JSONDecoder().decode(ArtistsSearchResponse.self, from: data)
-                                       print("\(decoded)")
-                                       let artists = decoded.artists.items
-                                       for artist in artists {
-                                           print("🎵 \(artist.name)")
-                                       }
-                                   }
-                                   
-                               } catch {
-                                   print("❌ Failed to decode: \(error)")
-                               }
-                           case .failure(let error):
-                               print("❌ Search failed: \(error.localizedDescription)")
+                        let accessToken = UserDefaults.standard.string(forKey: "access_token") ?? ""
+                        
+                        searchSpotifyItems(with: params, accessToken: accessToken) { result in
                             
+                            switch result {
+                            case .success(let data):
+                                if let jsonString = String(data: data, encoding: .utf8) {
+                                    print("✅ Pretty JSON:\n\(jsonString)")
+                                }
+                                DispatchQueue.main.async {
+                                    do {
+                                        switch searchFor {
+                                        case "album":
+                                            let decoded = try JSONDecoder().decode(AlbumSearchResponse.self, from: data)
+                                            self.albums = decoded.albums.items
+                                        case "track":
+                                            let decoded = try JSONDecoder().decode(TrackSearchResponse.self, from: data)
+                                            self.tracks = decoded.tracks.items
+                                        case "artist":
+                                            let decoded = try JSONDecoder().decode(ArtistsSearchResponse.self, from: data)
+                                            self.artists = decoded.artists.items
+                                        default:
+                                            break
+                                        }
+                                        withAnimation {
+                                            self.showResults = true
+                                        }
+                                    } catch {
+                                        print("❌ Decode error: \(error)")
+                                    }
+                                }
+                            case .failure(let error):
+                                print("❌ Search failed: \(error.localizedDescription)")
+                                
+                            }
                         }
                     }
                 }
+                .padding()
             }
-            .padding()
             
-            Text("Search result for: \(searchText)")
+            if showResults {
+                Text("What we got for you")
+                    .font(.headline)
+                if searchFor == "track" {
+                    List {
+                        ForEach(tracks, id: \.id) { track in
+                            HStack {
+                                AsyncImage(url: track.displayImageURL) { image in
+                                    image.resizable()
+                                    
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                Text(track.name)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                } else if searchFor == "album" {
+                    List {
+                        ForEach(albums, id: \.id) { track in
+                            HStack {
+                                AsyncImage(url: track.displayImageURL) { image in
+                                    image.resizable()
+                                    
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                Text(track.name)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                } else {
+                    List {
+                        ForEach(artists, id: \.id) { track in
+                            HStack {
+                                AsyncImage(url: track.displayImageURL) { image in
+                                    image.resizable()
+                                    
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
+                                Text(track.name)
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                }
+                Button("Go back to search") {
+                    withAnimation {
+                        showResults = false
+                    }
+                }
+                .padding()
+            }
         }
     }
 }
@@ -97,22 +158,44 @@ func searchSpotifyItems(
     if let keyword = params.keyword {
         queryItems.append(keyword)
     }
-    if let genre = params.genre {
-        queryItems.append("genre:\"\(genre)\"")
-    }
     if let year = params.year {
-        queryItems.append("year:\(year)")
+        print("Appeding-> year:\(year)")
+        if year == "" {
+            queryItems.append("year:2025")
+        }
+        else {
+            queryItems.append("year:\(year)")
+        }
     }
-    if let tag = params.tag {
-        queryItems.append("tag:\(tag)")
+    
+    //only artist and tracks
+    if params.type == "artist" || params.type == "track" {
+        if let genre = params.genre {
+            queryItems.append("genre:\"\(genre)\"")
+        }
     }
+    
+    //albums only
+    if params.type == "album" {
+        if let tag = params.tag {
+            queryItems.append("tag:\(tag)")
+        }
+    }
+    
+    /**
+    Artist -->  Keyword, Year, genre
+     Albums--> Keyword, Year, tag
+     Track --> Keyword, Year, genre
+     */
+    
+    let randomOffset = Int.random(in: 0..<200)
     
     let query = queryItems.joined(separator: " ")
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
     
     print("Query: \(query)")
     
-    guard let url = URL(string: "https://api.spotify.com/v1/search?q=\(query)&type=\(params.type)&limit=20") else {
+    guard let url = URL(string: "https://api.spotify.com/v1/search?q=\(query)&type=\(params.type)&limit=20&market=US&offset=\(randomOffset)") else {
         completion(.failure(NSError(domain: "InvalidURL", code: -1)))
         return
     }

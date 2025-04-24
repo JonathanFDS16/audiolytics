@@ -3,7 +3,7 @@ import Foundation
 struct TrackObject: Codable {
     let album: AlbumObject?
     let artists: [SimplifiedArtistObject]
-    let availableMarkets: [String]
+    let availableMarkets: [String]?
     let discNumber: Int
     let durationMs: Int
     let explicit: Bool

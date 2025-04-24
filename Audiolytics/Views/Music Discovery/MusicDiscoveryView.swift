@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct MusicDiscoveryView: View {
-    @State var isAnimating = false //TODO remember to set to true
+    @State var isAnimating = true //TODO remember to set to true
     @State var isSearching = false
     @State var scaleMagnifyingGlass = 1.0
     var body: some View {
@@ -29,11 +29,12 @@ struct MusicDiscoveryView: View {
                                 isSearching = true
                             }
                         }
-                    Text("Escape the Algorithm and explore something different!")
+                    Text("Escape the algorithm and explore something different!")
+                        .font(.headline)
                         .multilineTextAlignment(.center)
                         .padding()
                 }
-                .transition(.slide)
+                .transition(.opacity)
             }
             else if isSearching {
                 SearchView()

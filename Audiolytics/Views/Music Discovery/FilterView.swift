@@ -37,6 +37,7 @@ struct TrackFilterView: View {
                     }
                     .pickerStyle(MenuPickerStyle())
                 }
+                .transition(.opacity)
             }
 
             // Year Range Slider
@@ -44,6 +45,7 @@ struct TrackFilterView: View {
                 Text("Year or Year Range")
                 TextField("e.g 2020 or 1950-2025", text: $yearRange)
             }
+            .transition(.opacity)
             
             if searchMode != "artist" {
                 // Keyword Input
@@ -53,6 +55,7 @@ struct TrackFilterView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .clipShape(Capsule())
                 }
+                .transition(.opacity)
             }
             
             if searchMode == "album" {
@@ -95,6 +98,7 @@ struct TrackFilterView: View {
             Button(action: {
                 completion(yearRange, selectedGenre, keyword, false, false)
                 yearRange = ""//TODO fix this
+                keyword = ""
                 
             }) {
                 Text("Search")
