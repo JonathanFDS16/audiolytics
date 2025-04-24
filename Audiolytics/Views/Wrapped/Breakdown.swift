@@ -7,10 +7,6 @@
 import SwiftUI
 import Charts
 
-//need obscurity->take popularity of top songs (or artists??) and average
-//get genre based off of top artist
-
-
 struct Breakdown: View {
    
  

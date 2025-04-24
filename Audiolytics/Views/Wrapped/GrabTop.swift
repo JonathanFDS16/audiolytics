@@ -66,7 +66,7 @@ class SpotifyService {
                 print("Error fetching tracks: \(error.localizedDescription)")
                 completion([])
                 return
-            }
+            } 
             
             guard let data = data else {
                 print("No data returned")

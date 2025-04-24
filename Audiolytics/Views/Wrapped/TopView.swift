@@ -13,6 +13,10 @@ struct TopView: View {
     @State private var popularityList: [Int] = []
     @State private var timeFrame: String = "short_term"
     @State private var limit: Int = 10
+<<<<<<< Updated upstream
+=======
+    
+>>>>>>> Stashed changes
     
     func fetchTopTracks() {
         SpotifyService().getTopTracks(timeRange: timeFrame, limitNum: limit) { tracks in
@@ -40,8 +44,6 @@ struct TopView: View {
                 print(popularityList)
             }
         }
-        
-        
     }
     func getObscurity(){
         fetchGenres()
@@ -53,6 +55,7 @@ struct TopView: View {
     }
     
     
+<<<<<<< Updated upstream
     var body: some View {
         ScrollView{
             VStack() {
@@ -124,6 +127,104 @@ struct TopView: View {
                 .padding()
             }
             
+=======
+    func getObscurity(){
+        fetchGenres()
+        var popSum = popularityList.reduce(0, +)
+        var length = popularityList.count
+        var avgPop = Double(popSum)/Double(length)
+        var obscurityScore = (Int)(100.0 - avgPop)
+        print(obscurityScore)
+    }
+    
+    
+    var body: some View {
+        ScrollView{
+        VStack() {
+            Text("App")
+            
+            HStack(){
+                
+                //do segmented picker instead?
+                Button("short"){
+                    timeFrame = "short_term"
+                    fetchTopTracks()
+                    fetchTopArtists()
+                }
+                Button("med")
+                {
+                    timeFrame = "medium_term"
+                    fetchTopTracks()
+                    fetchTopArtists()
+                }
+                Button("long"){
+                    timeFrame = "long_term"
+                    fetchTopTracks()
+                    fetchTopArtists()
+                }
+                /*Picker("Number of entries", selection: $limit)
+                 {
+                 ForEach(1...50, id: \.self) { number in
+                 Text("\(number)")
+                 }
+                 }
+                 pickerStyle(.wheel)
+                 */
+                
+                Button("obscure")
+                {
+                    getObscurity()
+                }
+                
+            }
+            
+            
+            VStack() {
+                Text("Genres")
+                    .font(.title)
+
+                if genreList.isEmpty {
+                    Text("genre loading")
+                        .onAppear{
+                            fetchGenres()
+                        }
+                } else {
+                    ForEach(genreList, id: \.self) { genre in
+                        Text(genre)
+                    }
+                }
+            }
+            
+            Text("Top Tracks")
+                .font(.title)
+                .padding(.bottom)
+            
+            if topTracks.isEmpty {
+                Text("Loading...")
+                    .onAppear {
+                        fetchTopTracks()
+                    }
+            } else {
+                List(topTracks) { track in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(track.name)
+                            .font(.headline)
+                        Text(" by " + track.artists.map { $0.name }.joined(separator: ", "))
+                    }
+                    
+                    .padding(.vertical, 4)
+                }
+                .listStyle(.plain)
+            }
+        }
+        .padding()
+        
+        .frame(height: 350)
+        .padding()
+    }
+
+        
+>>>>>>> Stashed changes
             VStack(alignment: .leading) {
                 Text("Top Artists")
                     .font(.title)
@@ -150,6 +251,15 @@ struct TopView: View {
             .frame(height: 350)
             .padding()
         }
+<<<<<<< Updated upstream
+=======
+            
+    
+    
+    
+    
+    
+>>>>>>> Stashed changes
         
         
     }
