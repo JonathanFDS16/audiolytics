@@ -25,15 +25,11 @@ struct InfoCard: View {
                         .bold()
                         .padding(.top, 20)
                         .frame(alignment: .top)
-                    
                     Spacer()
-                    
                     content
-                    
                     Spacer()
                 }
                 .padding()
-              
             )
     }
 }
@@ -82,8 +78,6 @@ struct TopView: View {
         }
     }
     
-    
-    
     var body: some View {
         NavigationView{
             VStack{
@@ -104,8 +98,6 @@ struct TopView: View {
                 }
                 .padding()
                 
-                
-                
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 7) {
                         InfoCard(
@@ -124,9 +116,7 @@ struct TopView: View {
                                     }
                                 }
                             ),
-                            gradient: LinearGradient(gradient: Gradient(colors: [.blue, .green]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
-                            
-                            
+                            gradient: LinearGradient(gradient: Gradient(colors: [.blue, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .padding(.vertical)
                         .scrollTransition { content, phase in
@@ -151,7 +141,7 @@ struct TopView: View {
                                     }
                                 }
                             ),
-                            gradient: LinearGradient(gradient: Gradient(colors: [.pink, .orange]), startPoint: .topLeading, endPoint: .bottomTrailing) // Gradient
+                            gradient: LinearGradient(gradient: Gradient(colors: [.pink, .orange]), startPoint: .topLeading, endPoint: .bottomTrailing)
                             
                         )
                         .padding(.vertical)
@@ -169,10 +159,8 @@ struct TopView: View {
                                         Text("Loading genres...")
                                     }
                                     else {
-                                        
                                         let genreCounts = Dictionary(grouping: genreList, by: { $0 })
                                             .mapValues { $0.count }
-                                        
                                         Chart {
                                             ForEach(genreCounts.sorted(by: { $0.value > $1.value }), id: \.key) { genre, count in
                                                 SectorMark(
@@ -197,7 +185,6 @@ struct TopView: View {
                         InfoCard(title: "My Wrapped",
                                  content: AnyView(
                                     VStack() {
-                                        
                                         VStack() {
                                             Text("Top Tracks")
                                                 .font(.title2)
@@ -209,6 +196,7 @@ struct TopView: View {
                                             }
                                         }
                                         .padding()
+                                        
                                         VStack() {
                                             Text("Top Artists")
                                                 .font(.title2)
@@ -217,11 +205,10 @@ struct TopView: View {
                                             ForEach(Array(topArtists.prefix(5).enumerated()), id: \.element.id) { index, artist in
                                                 Text("\(index + 1). \(artist.name)")
                                                     .font(.headline)
-                                                
                                             }
                                         }
-                                    
-                                    .padding()
+                                        .padding()
+                                        
                                         VStack(){
                                             Spacer()
                                             Text("Obscurity Score: \(obscureScore)")
@@ -229,8 +216,7 @@ struct TopView: View {
                                         }
                                    
                                  ),
-                                 gradient: LinearGradient(gradient: Gradient(colors: [.blue, .purple, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing)).scrollTransition { content, phase in
-                            content
+                                 gradient: LinearGradient(gradient: Gradient(colors: [.blue, .purple, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing)).scrollTransition { content, phase in content
                                 .opacity(phase.isIdentity ? 1 : 0.5)
                                 .scaleEffect(phase.isIdentity ? 1 : 0.80)
                         }
@@ -259,7 +245,7 @@ struct TopView: View {
                     accessToken: accessToken,
                     uris: uriList,
                     onFinished: {
-                        print("success yippee")
+                        print("can successfully create a playlist")
                     }
                 )
             } else {
@@ -267,7 +253,7 @@ struct TopView: View {
                     accessToken: "",
                     uris: [String](),
                     onFinished: {
-                       print("not success sad")
+                       print("cannot create a playlist")
                     }
                 )
             }
@@ -277,13 +263,9 @@ struct TopView: View {
                 .foregroundColor(.black)
                 .font(.title2)
         }
-        
     }
 }
     
     #Preview {
         TopView()
     }
-    
-    
-

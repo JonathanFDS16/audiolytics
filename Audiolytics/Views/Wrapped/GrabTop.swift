@@ -75,11 +75,6 @@ class SpotifyService {
                 return
             }
             do {
-                /*
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print(" Raw JSON response:\n\(jsonString)")
-                }
-*/
                 let decoded = try JSONDecoder().decode(TopTracksResponse.self, from: data)
                 completion(decoded.items)
             } catch {
@@ -117,17 +112,7 @@ class SpotifyService {
                return
            }
            do {
-            /*   if let jsonString = String(data: data, encoding: .utf8) {
-                   print(" Raw JSON response:\n\(jsonString)")
-               }
-*/
                let decoded = try JSONDecoder().decode(TopArtistsResponse.self, from: data)
-              /* let artists = decoded.items.map { artist in
-                              Artist(
-                                  name: artist.name
-                              )
-                          }
-               */
                completion(decoded.items)
            } catch {
                print("Decoding failed: \(error)")
@@ -135,5 +120,4 @@ class SpotifyService {
            }
        }.resume()
    }
-
 }
